@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #FF9800 0%, #FF6F00 100%);
+    background: linear-gradient(135deg, #FFCA28 0%, #FFA726 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -21,7 +21,7 @@ body {
 }
 
 .header {
-    background: linear-gradient(135deg, #FF9800 0%, #FF6F00 100%);
+    background: linear-gradient(135deg, #FFCA28 0%, #FFA726 100%);
     color: white;
     padding: 30px 20px;
     text-align: center;
@@ -29,10 +29,9 @@ body {
 }
 
 .banner-img {
-    width: 100%;
     max-height: 200px;
     object-fit: cover;
-    margin-bottom: 15px;
+    margin: 0 auto 15px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     display: block;
@@ -73,7 +72,7 @@ body {
 
 #searchInput:focus {
     outline: none;
-    border-color: #FF9800;
+    border-color: #FFCA28;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -88,7 +87,7 @@ body {
 }
 
 #searchBtn {
-    background: linear-gradient(135deg, #FF9800 0%, #FF6F00 100%);
+    background: linear-gradient(135deg, #FFCA28 0%, #FFA726 100%);
     color: white;
 }
 
@@ -177,7 +176,7 @@ body {
 }
 
 .voter-card:hover {
-    border-color: #FF9800;
+    border-color: #FFCA28;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
     transform: translateY(-2px);
 }
@@ -198,7 +197,7 @@ body {
 }
 
 .voter-id {
-    background: linear-gradient(135deg, #FF9800 0%, #FF6F00 100%);
+    background: linear-gradient(135deg, #FFCA28 0%, #FFA726 100%);
     color: white;
     padding: 6px 12px;
     border-radius: 4px;
@@ -219,7 +218,7 @@ body {
 
 .detail-label {
     font-weight: 600;
-    color: #FF9800;
+    color: #FFCA28;
     font-size: 12px;
     text-transform: uppercase;
     margin-bottom: 4px;
@@ -264,7 +263,7 @@ body {
 .loading {
     text-align: center;
     padding: 20px;
-    color: #FF9800;
+    color: #FFCA28;
     font-weight: 500;
 }
 
