@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Voter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Voter Search System</h1>
+            <p>Search by Voter ID or Name</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Enter Voter ID or Name (First, Middle, or Last Name)"
+                    autocomplete="off"
+                >
+                <button id="searchBtn" onclick="searchVoters()">Search</button>
+                <button id="clearBtn" onclick="clearSearch()">Clear</button>
+            </div>
+
+            <div class="search-type">
+                <label>
+                    <input type="radio" name="searchType" value="all" checked> All Fields
+                </label>
+                <label>
+                    <input type="radio" name="searchType" value="voterID"> Voter ID
+                </label>
+                <label>
+                    <input type="radio" name="searchType" value="name"> Name
+                </label>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div id="resultInfo" class="result-info"></div>
+            
+            <div id="resultContainer" class="result-container">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
