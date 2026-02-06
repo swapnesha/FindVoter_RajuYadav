@@ -112,10 +112,12 @@ function filterVoters(searchTerm, searchType) {
         
         switch (searchType) {
             case 'voterID':
-                // Search by ID - match numeric ID
+                // Search by Voter ID or Voter Card ID
                 const voterId = String(voter.id || '').trim();
+                const voterCardId = String(voter.familyid || '').trim();
                 const searchId = searchTerm.trim();
-                isMatch = voterId.includes(searchId) || voterId === searchId;
+                isMatch = (voterId.includes(searchId) || voterId === searchId) ||
+                         (voterCardId.includes(searchId) || voterCardId === searchId);
                 break;
             
             case 'name':
@@ -126,12 +128,13 @@ function filterVoters(searchTerm, searchType) {
             
             case 'all':
             default:
-                // Search by ID or name (both English and Local)
+                // Search by Voter ID, Voter Card ID, or name (both English and Local)
                 const voterIdStr = String(voter.id || '').trim();
+                const voterCardIdStr = String(voter.familyid || '').trim();
                 
-                // Check ID match
-                const idMatch = voterIdStr.includes(searchTerm.trim()) || 
-                               voterIdStr === searchTerm.trim();
+                // Check ID match (Voter ID or Voter Card ID)
+                const idMatch = (voterIdStr.includes(searchTerm.trim()) || voterIdStr === searchTerm.trim()) ||
+                               (voterCardIdStr.includes(searchTerm.trim()) || voterCardIdStr === searchTerm.trim());
                 
                 // Check name match (English and Local)
                 const nameMatch = matchName(lowerSearchTerm, searchTerm, eFirstName, eMiddleName, eLastName, eFirstNameOriginal, eMiddleNameOriginal, eLastNameOriginal,
@@ -253,7 +256,7 @@ function createVoterCard(voter, resultNumber) {
             ${createDetailItem('House No', voter.house_no || 'N/A')}
             ${createDetailItem('Address (English)', voter.e_address || 'N/A')}
             ${voter.l_address ? createDetailItem('Address (Local)', voter.l_address) : ''}
-            ${createDetailItem('Family ID', voter.familyid || 'N/A')}
+            ${createDetailItem('Voter Card ID', voter.familyid || 'N/A')}
             ${voter.mobile_no1 ? createDetailItem('Mobile 1', voter.mobile_no1) : ''}
             ${voter.mobile_no2 ? createDetailItem('Mobile 2', voter.mobile_no2) : ''}
             ${voter.emailid ? createDetailItem('Email', voter.emailid) : ''}
