@@ -1,0 +1,36 @@
+🚀 QUICK START
+==============
+
+⚠️  IMPORTANT: You MUST use an HTTP server - opening index.html directly WON'T work!
+
+FASTEST WAY TO START:
+
+1. Open Terminal/Command Prompt
+2. Navigate to this folder
+3. Run ONE of these commands:
+
+   OPTION A - Python (No installation needed):
+   python3 -m http.server 8000
+
+   OPTION B - Node.js:
+   npx http-server -p 8000
+
+4. Open browser: http://localhost:8000
+
+5. Search for any voter by:
+   - Voter ID (e.g., 2207300100001)
+   - English name (e.g., Nilesh)
+   - Marathi name (e.g., शिवराज)
+
+6. To stop server: Press Ctrl+C
+
+
+📊 DATABASE READY
+- 30,709 voters loaded
+- English & Marathi names supported
+- Full voter details available
+
+💡 HELP
+- Check browser console (F12) for debug logs
+- Read SETUP_GUIDE.md for detailed instructions
+- Search partial names like "Yadav" or "Mal"

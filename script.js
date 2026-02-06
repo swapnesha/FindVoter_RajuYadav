@@ -1,13 +1,19 @@
 let votersData = [];
 let filteredResults = [];
 
-// Load voters data on page load
-document.addEventListener('DOMContentLoaded', loadVotersData);
-
-// Allow search on Enter key
-document.getElementById('searchInput').addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
-        searchVoters();
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Load voters data
+    loadVotersData();
+    
+    // Allow search on Enter key
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                searchVoters();
+            }
+        });
     }
 });
 

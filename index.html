@@ -47,14 +47,21 @@
 
             <div class="debug-section" style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 6px; font-size: 12px;">
                 <details>
-                    <summary style="cursor: pointer; font-weight: 600; color: #666;">🐛 Debug Information</summary>
-                    <p style="margin-top: 10px; color: #666;">
-                        Open Browser Console (F12) to see debug logs.<br>
-                        Make sure votersJSON.json file is in the same directory as index.html
-                    </p>
-                    <button onclick="testSearch()" style="margin-top: 10px; padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                        Show Sample Voters (See Console)
-                    </button>
+                    <summary style="cursor: pointer; font-weight: 600; color: #666;">� Help & Tips</summary>
+                    <div style="margin-top: 10px; color: #666; line-height: 1.6;">
+                        <p><strong>Search tips:</strong></p>
+                        <ul style="margin: 8px 0 8px 20px;">
+                            <li>Search by Voter ID: <code style="background: white; padding: 2px 4px;">2207300100001</code></li>
+                            <li>Search by English name: <code style="background: white; padding: 2px 4px;">Nilesh</code> or <code style="background: white; padding: 2px 4px;">Malavekar</code></li>
+                            <li>Search by Marathi name: <code style="background: white; padding: 2px 4px;">शिवराज</code> or <code style="background: white; padding: 2px 4px;">यादव</code></li>
+                        </ul>
+                        <p style="margin-top: 10px;"><strong>Troubleshooting:</strong></p>
+                        <ul style="margin: 8px 0 0 20px;">
+                            <li>Open Browser Console (F12) to see debug logs</li>
+                            <li>Ensure votersJSON.json is in the same folder as index.html</li>
+                            <li>Refresh page if data doesn't load</li>
+                        </ul>
+                    </div>
                 </details>
             </div>
         </div>
