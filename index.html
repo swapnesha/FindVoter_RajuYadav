@@ -18,7 +18,7 @@
                 <input 
                     type="text" 
                     id="searchInput" 
-                    placeholder="Enter Voter ID or Name (First, Middle, or Last Name)"
+                    placeholder="Enter Voter ID, English name, or Marathi name"
                     autocomplete="off"
                 >
                 <button id="searchBtn" onclick="searchVoters()">Search</button>
@@ -43,6 +43,19 @@
             
             <div id="resultContainer" class="result-container">
                 <!-- Results will be displayed here -->
+            </div>
+
+            <div class="debug-section" style="margin-top: 30px; padding: 15px; background: #f0f0f0; border-radius: 6px; font-size: 12px;">
+                <details>
+                    <summary style="cursor: pointer; font-weight: 600; color: #666;">🐛 Debug Information</summary>
+                    <p style="margin-top: 10px; color: #666;">
+                        Open Browser Console (F12) to see debug logs.<br>
+                        Make sure votersJSON.json file is in the same directory as index.html
+                    </p>
+                    <button onclick="testSearch()" style="margin-top: 10px; padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Show Sample Voters (See Console)
+                    </button>
+                </details>
             </div>
         </div>
     </div>

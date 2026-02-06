@@ -14,15 +14,31 @@ document.getElementById('searchInput').addEventListener('keypress', function(eve
 // Function to load voters data from JSON file
 async function loadVotersData() {
     try {
+        console.log('⏳ Attempting to load votersJSON.json...');
+        
         const response = await fetch('votersJSON.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         votersData = await response.json();
-        showResultInfo(`Data loaded successfully. Total voters: ${votersData.length}`, 'info');
+        console.log('✓ Data loaded successfully from votersJSON.json');
+        console.log('Total voters:', votersData.length);
+        console.log('Sample voter:', votersData[0]);
+        
+        showResultInfo(`✓ Data loaded successfully. Total voters: ${votersData.length}`, 'info');
     } catch (error) {
-        console.error('Error loading voters data:', error);
-        showResultInfo('Error loading voters data. Please make sure votersJSON.json is in the same directory.', 'error');
+        console.error('✗ Error loading voters data:', error);
+        console.error('Error details:', {
+            message: error.message,
+            name: error.name,
+            stack: error.stack
+        });
+        
+        showResultInfo(
+            '⚠️ Error loading data. Please ensure votersJSON.json is in the same directory as index.html and refresh the page.',
+            'error'
+        );
     }
 }
 
@@ -31,6 +47,8 @@ function searchVoters() {
     const searchTerm = document.getElementById('searchInput').value.trim();
     const searchType = document.querySelector('input[name="searchType"]:checked').value;
 
+    console.log('🔍 Search initiated:', { searchTerm, searchType, totalVotersLoaded: votersData.length });
+
     if (!searchTerm) {
         showResultInfo('Please enter a search term', 'error');
         clearResults();
@@ -38,14 +56,19 @@ function searchVoters() {
     }
 
     if (votersData.length === 0) {
-        showResultInfo('Data not loaded yet. Please refresh the page.', 'error');
+        console.warn('⚠️ No data loaded. Total voters:', votersData.length);
+        showResultInfo('❌ Data not loaded yet. Please refresh the page and wait for "Data loaded successfully" message.', 'error');
         return;
     }
 
     filteredResults = filterVoters(searchTerm, searchType);
 
+    console.log('✓ Search completed. Results found:', filteredResults.length);
+    console.log('Filtered results:', filteredResults.slice(0, 3)); // Log first 3 results
+    
     if (filteredResults.length === 0) {
-        showResultInfo(`No voters found matching "${searchTerm}"`, 'error');
+        console.warn('⚠️ No voters found for:', searchTerm);
+        showResultInfo(`No voters found matching "${searchTerm}". Try a different name or voter ID.`, 'error');
         clearResults();
     } else {
         showResultInfo(`Found ${filteredResults.length} voter(s) matching "${searchTerm}"`, 'success');
@@ -55,38 +78,85 @@ function searchVoters() {
 
 // Filter voters based on search term and type
 function filterVoters(searchTerm, searchType) {
-    const lowerSearchTerm = searchTerm.toLowerCase();
+    const lowerSearchTerm = searchTerm.toLowerCase().trim();
+    console.log('Filtering with:', { searchTerm, searchType, totalVoters: votersData.length });
     
-    return votersData.filter(voter => {
+    return votersData.filter((voter, index) => {
+        let isMatch = false;
+        
+        // English name fields
+        const eFirstName = (voter.e_first_name || '').trim().toLowerCase();
+        const eMiddleName = (voter.e_middle_name || '').trim().toLowerCase();
+        const eLastName = (voter.e_last_name || '').trim().toLowerCase();
+        
+        // Local (Marathi/Hindi) script name fields
+        const lFirstName = (voter.l_first_name || '').trim().toLowerCase();
+        const lMiddleName = (voter.l_middle_name || '').trim().toLowerCase();
+        const lLastName = (voter.l_last_name || '').trim().toLowerCase();
+        
+        // Local script fields without toLowerCase (for exact Unicode match)
+        const lFirstNameOriginal = (voter.l_first_name || '').trim();
+        const lMiddleNameOriginal = (voter.l_middle_name || '').trim();
+        const lLastNameOriginal = (voter.l_last_name || '').trim();
+        
         switch (searchType) {
             case 'voterID':
-                // Search only by ID
-                return voter.id.toString().includes(searchTerm);
+                // Search by ID - match numeric ID
+                const voterId = String(voter.id || '').trim();
+                const searchId = searchTerm.trim();
+                isMatch = voterId.includes(searchId) || voterId === searchId;
+                break;
             
             case 'name':
-                // Search by name fields
-                const firstName = (voter.e_first_name || '').toLowerCase();
-                const middleName = (voter.e_middle_name || '').toLowerCase();
-                const lastName = (voter.e_last_name || '').toLowerCase();
-                const fullName = `${firstName} ${middleName} ${lastName}`.toLowerCase();
+                // Search by name fields (both English and Local script)
+                // English names (case-insensitive)
+                const englishMatch = eFirstName.includes(lowerSearchTerm) ||
+                       eMiddleName.includes(lowerSearchTerm) ||
+                       eLastName.includes(lowerSearchTerm);
                 
-                return firstName.includes(lowerSearchTerm) ||
-                       middleName.includes(lowerSearchTerm) ||
-                       lastName.includes(lowerSearchTerm) ||
-                       fullName.includes(lowerSearchTerm);
+                // Local script names (case-insensitive for Latin chars, exact match for Devanagari)
+                const localMatch = lFirstName.includes(lowerSearchTerm) ||
+                       lMiddleName.includes(lowerSearchTerm) ||
+                       lLastName.includes(lowerSearchTerm) ||
+                       lFirstNameOriginal.includes(searchTerm) ||
+                       lMiddleNameOriginal.includes(searchTerm) ||
+                       lLastNameOriginal.includes(searchTerm);
+                
+                isMatch = englishMatch || localMatch;
+                break;
             
             case 'all':
             default:
-                // Search by ID or name
-                const voterID = voter.id.toString().includes(searchTerm);
-                const voterName = (
-                    (voter.e_first_name || '').toLowerCase().includes(lowerSearchTerm) ||
-                    (voter.e_middle_name || '').toLowerCase().includes(lowerSearchTerm) ||
-                    (voter.e_last_name || '').toLowerCase().includes(lowerSearchTerm)
-                );
+                // Search by ID or name (both English and Local)
+                const voterIdStr = String(voter.id || '').trim();
                 
-                return voterID || voterName;
+                // Check ID match
+                const idMatch = voterIdStr.includes(searchTerm.trim()) || 
+                               voterIdStr === searchTerm.trim();
+                
+                // Check English name match
+                const engNameMatch = eFirstName.includes(lowerSearchTerm) ||
+                                 eMiddleName.includes(lowerSearchTerm) ||
+                                 eLastName.includes(lowerSearchTerm);
+                
+                // Check local script name match
+                const localNameMatch = lFirstName.includes(lowerSearchTerm) ||
+                                      lMiddleName.includes(lowerSearchTerm) ||
+                                      lLastName.includes(lowerSearchTerm) ||
+                                      lFirstNameOriginal.includes(searchTerm) ||
+                                      lMiddleNameOriginal.includes(searchTerm) ||
+                                      lLastNameOriginal.includes(searchTerm);
+                
+                isMatch = idMatch || engNameMatch || localNameMatch;
+                break;
         }
+        
+        // Log first few matches for debugging
+        if (isMatch && index < 10) {
+            console.log(`Match found: ${voter.e_first_name} ${voter.e_last_name} / ${voter.l_first_name} ${voter.l_last_name} (ID: ${voter.id})`);
+        }
+        
+        return isMatch;
     });
 }
 
@@ -122,10 +192,13 @@ function createVoterCard(voter, resultNumber) {
             ${createDetailItem('Sex', voter.sex || 'N/A')}
             ${createDetailItem('Booth ID', voter.boothid || 'N/A')}
             ${createDetailItem('Booth No', voter.booth_no || 'N/A')}
-            ${createDetailItem('Assembly Name', voter.e_assemblyname || 'N/A')}
+            ${createDetailItem('Assembly (English)', voter.e_assemblyname || 'N/A')}
+            ${voter.l_assemblyname ? createDetailItem('Assembly (Local)', voter.l_assemblyname) : ''}
             ${createDetailItem('Village', voter.e_village || 'N/A')}
+            ${voter.l_village ? createDetailItem('Village (Local)', voter.l_village) : ''}
             ${createDetailItem('House No', voter.house_no || 'N/A')}
-            ${createDetailItem('Address', voter.e_address || 'N/A')}
+            ${createDetailItem('Address (English)', voter.e_address || 'N/A')}
+            ${voter.l_address ? createDetailItem('Address (Local)', voter.l_address) : ''}
             ${createDetailItem('Family ID', voter.familyid || 'N/A')}
             ${createDetailItem('Voted', voter.voted || 'N/A')}
             ${voter.mobile_no1 ? createDetailItem('Mobile 1', voter.mobile_no1) : ''}
@@ -147,16 +220,32 @@ function createDetailItem(label, value) {
     `;
 }
 
-// Build full name from components
+// Build full name from components (both English and Local)
 function buildFullName(voter) {
     const firstName = voter.e_first_name || '';
     const middleName = voter.e_middle_name || '';
     const lastName = voter.e_last_name || '';
     
-    return [firstName, middleName, lastName]
+    const englishName = [firstName, middleName, lastName]
         .filter(name => name.trim() !== '')
         .join(' ')
         .trim() || 'Unknown';
+    
+    // Also include local script name if available
+    const lFirstName = voter.l_first_name || '';
+    const lMiddleName = voter.l_middle_name || '';
+    const lLastName = voter.l_last_name || '';
+    
+    const localName = [lFirstName, lMiddleName, lLastName]
+        .filter(name => name.trim() !== '')
+        .join(' ')
+        .trim();
+    
+    if (localName && localName !== englishName) {
+        return `${englishName} (${localName})`;
+    }
+    
+    return englishName;
 }
 
 // Show result information message
@@ -189,4 +278,39 @@ function clearSearch() {
     document.getElementById('resultInfo').className = 'result-info';
     document.getElementById('resultInfo').textContent = '';
     filteredResults = [];
+    console.log('🔄 Search cleared');
+}
+
+// Test function - shows sample voters (for debugging)
+function testSearch() {
+    console.log('📋 === VOTER DATA TEST ===');
+    console.log('Total voters loaded:', votersData.length);
+    
+    if (votersData.length === 0) {
+        console.warn('❌ No data loaded! votersJSON.json may not have loaded correctly.');
+        alert('❌ No data loaded. Please check:\n1. votersJSON.json is in the same folder as index.html\n2. Refresh the page\n3. Check browser console (F12) for errors');
+        return;
+    }
+    
+    console.log('\n--- First 5 Voters ---');
+    for (let i = 0; i < Math.min(5, votersData.length); i++) {
+        const v = votersData[i];
+        console.log(`${i+1}. ${v.e_first_name} ${v.e_middle_name} ${v.e_last_name} (ID: ${v.id})`);
+    }
+    
+    console.log('\n--- Test Searches ---');
+    const testNames = [votersData[0].e_first_name, votersData[1].e_first_name, votersData[0].id];
+    testNames.forEach(name => {
+        const results = votersData.filter(v => {
+            const fn = (v.e_first_name || '').toLowerCase().trim();
+            const mn = (v.e_middle_name || '').toLowerCase().trim();
+            const ln = (v.e_last_name || '').toLowerCase().trim();
+            const id = String(v.id || '').trim();
+            const searchStr = String(name).toLowerCase().trim();
+            return fn.includes(searchStr) || mn.includes(searchStr) || ln.includes(searchStr) || id.includes(searchStr);
+        });
+        console.log(`Search for "${name}": ${results.length} results`);
+    });
+    
+    alert('✓ Check console (F12) for voter data and test results');
 }
