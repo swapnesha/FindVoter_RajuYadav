@@ -115,20 +115,8 @@ function filterVoters(searchTerm, searchType) {
             
             case 'name':
                 // Search by name fields (both English and Local script)
-                // English names (case-insensitive)
-                const englishMatch = eFirstName.includes(lowerSearchTerm) ||
-                       eMiddleName.includes(lowerSearchTerm) ||
-                       eLastName.includes(lowerSearchTerm);
-                
-                // Local script names (case-insensitive for Latin chars, exact match for Devanagari)
-                const localMatch = lFirstName.includes(lowerSearchTerm) ||
-                       lMiddleName.includes(lowerSearchTerm) ||
-                       lLastName.includes(lowerSearchTerm) ||
-                       lFirstNameOriginal.includes(searchTerm) ||
-                       lMiddleNameOriginal.includes(searchTerm) ||
-                       lLastNameOriginal.includes(searchTerm);
-                
-                isMatch = englishMatch || localMatch;
+                isMatch = matchName(lowerSearchTerm, searchTerm, eFirstName, eMiddleName, eLastName, 
+                                   lFirstName, lMiddleName, lLastName, lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal);
                 break;
             
             case 'all':
@@ -140,30 +128,80 @@ function filterVoters(searchTerm, searchType) {
                 const idMatch = voterIdStr.includes(searchTerm.trim()) || 
                                voterIdStr === searchTerm.trim();
                 
-                // Check English name match
-                const engNameMatch = eFirstName.includes(lowerSearchTerm) ||
-                                 eMiddleName.includes(lowerSearchTerm) ||
-                                 eLastName.includes(lowerSearchTerm);
+                // Check name match (English and Local)
+                const nameMatch = matchName(lowerSearchTerm, searchTerm, eFirstName, eMiddleName, eLastName, 
+                                           lFirstName, lMiddleName, lLastName, lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal);
                 
-                // Check local script name match
-                const localNameMatch = lFirstName.includes(lowerSearchTerm) ||
-                                      lMiddleName.includes(lowerSearchTerm) ||
-                                      lLastName.includes(lowerSearchTerm) ||
-                                      lFirstNameOriginal.includes(searchTerm) ||
-                                      lMiddleNameOriginal.includes(searchTerm) ||
-                                      lLastNameOriginal.includes(searchTerm);
-                
-                isMatch = idMatch || engNameMatch || localNameMatch;
+                isMatch = idMatch || nameMatch;
                 break;
         }
         
         // Log first few matches for debugging
         if (isMatch && index < 10) {
-            console.log(`Match found: ${voter.e_first_name} ${voter.e_last_name} / ${voter.l_first_name} ${voter.l_last_name} (ID: ${voter.id})`);
+            console.log(`Match found: ${voter.e_first_name} ${voter.e_last_name} / ${voter.l_first_name} ${voter.l_middle_name} ${voter.l_last_name} (ID: ${voter.id})`);
         }
         
         return isMatch;
     });
+}
+
+// Helper function to match names (handles multi-word searches)
+function matchName(lowerSearchTerm, originalSearchTerm, eFirstName, eMiddleName, eLastName, 
+                   lFirstName, lMiddleName, lLastName, lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal) {
+    
+    // Split search term by spaces for multi-word searches like "शिवराज अनिल यादव"
+    const searchWords = originalSearchTerm.trim().split(/\s+/).filter(w => w.length > 0);
+    
+    // If multi-word search (e.g., "Shivaraj Yadav" or "शिवराज यादव")
+    if (searchWords.length > 1) {
+        // Try to match words against name fields (first, middle, last)
+        const allNameFields = [eFirstName, eMiddleName, eLastName, lFirstName, lMiddleName, lLastName];
+        const allNameFieldsOriginal = [eFirstNameOriginal || '', eMiddleNameOriginal || '', eLastNameOriginal || '', 
+                                      lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal];
+        
+        // Check if all search words can be matched to name fields
+        let allWordsMatched = true;
+        for (let word of searchWords) {
+            const wordLower = word.toLowerCase();
+            let foundMatch = false;
+            
+            // Try to find this word in any name field
+            for (let i = 0; i < allNameFields.length; i++) {
+                if (allNameFields[i].includes(wordLower) || allNameFieldsOriginal[i].includes(word)) {
+                    foundMatch = true;
+                    break;
+                }
+            }
+            
+            if (!foundMatch) {
+                allWordsMatched = false;
+                break;
+            }
+        }
+        
+        if (allWordsMatched) {
+            return true;
+        }
+        
+        // Also try matching against concatenated names
+        const concatEnglish = `${eFirstName} ${eMiddleName} ${eLastName}`.toLowerCase();
+        const concatLocal = `${lFirstNameOriginal} ${lMiddleNameOriginal} ${lLastNameOriginal}`;
+        return concatEnglish.includes(originalSearchTerm) || concatLocal.includes(originalSearchTerm);
+    }
+    
+    // Single word search (original logic)
+    const englishMatch = eFirstName.includes(lowerSearchTerm) ||
+           eMiddleName.includes(lowerSearchTerm) ||
+           eLastName.includes(lowerSearchTerm);
+    
+    const localMatch = lFirstName.includes(lowerSearchTerm) ||
+           lMiddleName.includes(lowerSearchTerm) ||
+           lLastName.includes(lowerSearchTerm) ||
+           lFirstNameOriginal.includes(originalSearchTerm) ||
+           lMiddleNameOriginal.includes(originalSearchTerm) ||
+           lLastNameOriginal.includes(originalSearchTerm);
+    
+    return englishMatch || localMatch;
 }
 
 // Display search results
