@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #FFCA28 0%, #FFA726 100%);
+    background: linear-gradient(135deg, #ffa828 0%, #FFA726 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -21,7 +21,7 @@ body {
 }
 
 .header {
-    background: linear-gradient(135deg, #FFCA28 0%, #FFA726 100%);
+    background: linear-gradient(135deg, #ffbe28 0%, #e89823 100%);
     color: white;
     padding: 30px 20px;
     text-align: center;
