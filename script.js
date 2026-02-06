@@ -90,17 +90,22 @@ function filterVoters(searchTerm, searchType) {
     return votersData.filter((voter, index) => {
         let isMatch = false;
         
-        // English name fields
+        // English name fields (lowercase for comparison)
         const eFirstName = (voter.e_first_name || '').trim().toLowerCase();
         const eMiddleName = (voter.e_middle_name || '').trim().toLowerCase();
         const eLastName = (voter.e_last_name || '').trim().toLowerCase();
         
-        // Local (Marathi/Hindi) script name fields
+        // English name fields (original for exact match)
+        const eFirstNameOriginal = (voter.e_first_name || '').trim();
+        const eMiddleNameOriginal = (voter.e_middle_name || '').trim();
+        const eLastNameOriginal = (voter.e_last_name || '').trim();
+        
+        // Local (Marathi/Hindi) script name fields (lowercase for comparison)
         const lFirstName = (voter.l_first_name || '').trim().toLowerCase();
         const lMiddleName = (voter.l_middle_name || '').trim().toLowerCase();
         const lLastName = (voter.l_last_name || '').trim().toLowerCase();
         
-        // Local script fields without toLowerCase (for exact Unicode match)
+        // Local script fields (original for exact Unicode match)
         const lFirstNameOriginal = (voter.l_first_name || '').trim();
         const lMiddleNameOriginal = (voter.l_middle_name || '').trim();
         const lLastNameOriginal = (voter.l_last_name || '').trim();
@@ -115,7 +120,7 @@ function filterVoters(searchTerm, searchType) {
             
             case 'name':
                 // Search by name fields (both English and Local script)
-                isMatch = matchName(lowerSearchTerm, searchTerm, eFirstName, eMiddleName, eLastName, 
+                isMatch = matchName(lowerSearchTerm, searchTerm, eFirstName, eMiddleName, eLastName, eFirstNameOriginal, eMiddleNameOriginal, eLastNameOriginal,
                                    lFirstName, lMiddleName, lLastName, lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal);
                 break;
             
@@ -129,7 +134,7 @@ function filterVoters(searchTerm, searchType) {
                                voterIdStr === searchTerm.trim();
                 
                 // Check name match (English and Local)
-                const nameMatch = matchName(lowerSearchTerm, searchTerm, eFirstName, eMiddleName, eLastName, 
+                const nameMatch = matchName(lowerSearchTerm, searchTerm, eFirstName, eMiddleName, eLastName, eFirstNameOriginal, eMiddleNameOriginal, eLastNameOriginal,
                                            lFirstName, lMiddleName, lLastName, lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal);
                 
                 isMatch = idMatch || nameMatch;
@@ -146,7 +151,7 @@ function filterVoters(searchTerm, searchType) {
 }
 
 // Helper function to match names (handles multi-word searches)
-function matchName(lowerSearchTerm, originalSearchTerm, eFirstName, eMiddleName, eLastName, 
+function matchName(lowerSearchTerm, originalSearchTerm, eFirstName, eMiddleName, eLastName, eFirstNameOriginal, eMiddleNameOriginal, eLastNameOriginal,
                    lFirstName, lMiddleName, lLastName, lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal) {
     
     // Split search term by spaces for multi-word searches like "शिवराज अनिल यादव"
@@ -156,7 +161,7 @@ function matchName(lowerSearchTerm, originalSearchTerm, eFirstName, eMiddleName,
     if (searchWords.length > 1) {
         // Try to match words against name fields (first, middle, last)
         const allNameFields = [eFirstName, eMiddleName, eLastName, lFirstName, lMiddleName, lLastName];
-        const allNameFieldsOriginal = [eFirstNameOriginal || '', eMiddleNameOriginal || '', eLastNameOriginal || '', 
+        const allNameFieldsOriginal = [eFirstNameOriginal, eMiddleNameOriginal, eLastNameOriginal, 
                                       lFirstNameOriginal, lMiddleNameOriginal, lLastNameOriginal];
         
         // Check if all search words can be matched to name fields
@@ -192,7 +197,10 @@ function matchName(lowerSearchTerm, originalSearchTerm, eFirstName, eMiddleName,
     // Single word search (original logic)
     const englishMatch = eFirstName.includes(lowerSearchTerm) ||
            eMiddleName.includes(lowerSearchTerm) ||
-           eLastName.includes(lowerSearchTerm);
+           eLastName.includes(lowerSearchTerm) ||
+           eFirstNameOriginal.includes(originalSearchTerm) ||
+           eMiddleNameOriginal.includes(originalSearchTerm) ||
+           eLastNameOriginal.includes(originalSearchTerm);
     
     const localMatch = lFirstName.includes(lowerSearchTerm) ||
            lMiddleName.includes(lowerSearchTerm) ||
