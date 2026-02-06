@@ -244,6 +244,8 @@ function createVoterCard(voter, resultNumber) {
             ${createDetailItem('Sex', voter.sex || 'N/A')}
             ${createDetailItem('Booth ID', voter.boothid || 'N/A')}
             ${createDetailItem('Booth No', voter.booth_no || 'N/A')}
+            ${createDetailItem('Booth Address (English)', voter.e_boothaddress || 'N/A')}
+            ${voter.l_boothaddress ? createDetailItem('Booth Address (Local)', voter.l_boothaddress) : ''}
             ${createDetailItem('Assembly (English)', voter.e_assemblyname || 'N/A')}
             ${voter.l_assemblyname ? createDetailItem('Assembly (Local)', voter.l_assemblyname) : ''}
             ${createDetailItem('Village', voter.e_village || 'N/A')}
@@ -252,7 +254,6 @@ function createVoterCard(voter, resultNumber) {
             ${createDetailItem('Address (English)', voter.e_address || 'N/A')}
             ${voter.l_address ? createDetailItem('Address (Local)', voter.l_address) : ''}
             ${createDetailItem('Family ID', voter.familyid || 'N/A')}
-            ${createDetailItem('Voted', voter.voted || 'N/A')}
             ${voter.mobile_no1 ? createDetailItem('Mobile 1', voter.mobile_no1) : ''}
             ${voter.mobile_no2 ? createDetailItem('Mobile 2', voter.mobile_no2) : ''}
             ${voter.emailid ? createDetailItem('Email', voter.emailid) : ''}
